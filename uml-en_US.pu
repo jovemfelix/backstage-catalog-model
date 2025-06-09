@@ -1,0 +1,193 @@
+@startuml
+!theme plain
+title Layered Representation of the Backstage Catalog (with Template)
+
+' Layout direction to reinforce the layered concept
+top to bottom direction
+
+' Styles to improve readability
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor White
+    ArrowColor #222222
+    BorderColor #222222
+}
+skinparam package {
+    BackgroundColor LightBlue
+    BorderColor #555555
+    FontColor #333333
+}
+skinparam legend {
+    BorderColor black
+    BackgroundColor white
+}
+
+' ===================================
+' ====== LAYER 1: CORE PROTOCOL ======
+' ===================================
+package "Layer 1: Core Protocol (The Foundation)" as Layer01 #LightGrey {
+  abstract class Entity {
+    + apiVersion: String
+    + kind: String
+    --
+    + spec: Object
+  }
+}
+
+' ===================================
+' ====== LAYER 2: COMMON STRUCTURES ======
+' ===================================
+package "Layer 2: Common Structures (Building Blocks)" as Layer02 #LightCyan {
+  class EntityMeta {
+    + name: String
+    + namespace: String
+    + title: String
+    + description: String
+    + tags: String[]
+    ...
+  }
+
+  class Relation {
+    + type: String
+    + targetRef: String
+  }
+}
+
+' ===================================
+' ====== LAYER 3: IDENTITY & OWNERSHIP (THE WHO) ======
+' ===================================
+package "Layer 3: Identity & Ownership (The Who)" as Layer03 #LightGreen {
+  class User <<Entity>> {
+    {field} spec:
+    + profile: Object
+    + memberOf: String[]
+  }
+
+  class Group <<Entity>> {
+    {field} spec:
+    + type: String
+    + parent: String
+    + children: String[]
+    + members: String[]
+  }
+}
+
+' ===================================
+' ====== LAYER 4: ARCHITECTURAL ABSTRACTION (THE WHAT) ======
+' ===================================
+package "Layer 4: Architectural Abstraction (The What)" as Layer04 #LightGoldenRodYellow {
+  class Domain <<Entity>> {
+    {field} spec:
+    + owner: String
+  }
+
+  class System <<Entity>> {
+    {field} spec:
+    + owner: String
+    + domain: String
+  }
+}
+
+' ===================================
+' ====== LAYER 5: CONCRETE IMPLEMENTATION (THE HOW) ======
+' ===================================
+package "Layer 5: Concrete Implementation (The How)" as Layer05 #LightSalmon {
+  class Component <<Entity>> {
+    {field} spec:
+    + type: String
+    + lifecycle: String
+    + owner: String
+    + system: String
+    ...
+  }
+
+  class API <<Entity>> {
+    {field} spec:
+    + type: String
+    + lifecycle: String
+    + owner: String
+    + system: String
+    ...
+  }
+
+  class Resource <<Entity>> {
+    {field} spec:
+    + type: String
+    + owner: String
+    + system: String
+  }
+}
+
+' ====================================================
+' ====== LAYER 6: TOOLING & AUTOMATION (META-LAYER) ======
+' ====================================================
+package "Layer 6: Tooling & Automation (Meta-Layer)" as Layer06 #LightPink {
+    class Location <<Entity>> {
+        {field} spec:
+        + type: String
+        + target: String
+    }
+
+    class Template {
+        {field} spec:
+        + type: String
+        + owner: String
+        + parameters: Object[]
+        + steps: Object[]
+    }
+}
+
+
+' ===============================================
+' ====== RELATIONSHIPS & DEPENDENCIES BETWEEN LAYERS ======
+' ===============================================
+
+' Inheritance: All concrete kinds inherit from the abstract Entity
+Entity <|-- User
+Entity <|-- Group
+Entity <|-- Domain
+Entity <|-- System
+Entity <|-- Component
+Entity <|-- API
+Entity <|-- Resource
+Entity <|-- Location
+Entity <|-- Template
+
+
+' Composition: The base entity is composed of common structures
+Entity *-- "1" EntityMeta
+Entity *-- "0..*" Relation
+
+' Association relationships that define the catalog graph
+User --|> Group : "memberOf"
+Group o-- "0..*" Group : "parent/children"
+System --> Domain : "partOf"
+Component --> System : "partOf"
+API --> System : "partOf"
+Resource --> System : "partOf"
+Component --> API : "provides/\nconsumes"
+
+' Functional relationship of the Template
+Template ..> Component : "creates"
+
+' Logical dependencies between layers
+Layer05 ..> Layer04 : depends on
+Layer04 ..> Layer03 : "owner" refers to
+Layer05 ..> Layer03 : "owner" refers to
+Layer06 ..> Layer03 : "owner" refers to
+
+
+legend right
+  **Layer Legend**
+
+  * **1 (Core Protocol):** The abstract definition common to all entities.
+  * **2 (Common Structures):** Reusable data building blocks.
+  * **3 (Identity):** Models the people and teams.
+  * **4 (Architecture):** The high-level, logical view of software.
+  * **5 (Implementation):** Concrete, technical assets.
+  * **6 (Tooling):** Meta-entities that act on the catalog (automation & discovery).
+end legend
+
+hide empty members
+
+@enduml

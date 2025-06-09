@@ -1,0 +1,193 @@
+@startuml
+!theme plain
+title Representação em Camadas do Catálogo Backstage (com Template)
+
+' Direção do layout para reforçar a ideia de camadas
+top to bottom direction
+
+' Estilos para melhorar a legibilidade
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor White
+    ArrowColor #222222
+    BorderColor #222222
+}
+skinparam package {
+    BackgroundColor LightBlue
+    BorderColor #555555
+    FontColor #333333
+}
+skinparam legend {
+    BorderColor black
+    BackgroundColor white
+}
+
+' ===================================
+' ====== CAMADA 1: PROTOCOLO CORE ======
+' ===================================
+package "Camada 1: Protocolo Core (A Fundação)" as Camada01 #LightGrey {
+  abstract class Entity {
+    + apiVersion: String
+    + kind: String
+    --
+    + spec: Object
+  }
+}
+
+' ===================================
+' ====== CAMADA 2: ESTRUTURAS COMUNS ======
+' ===================================
+package "Camada 2: Estruturas Comuns (Blocos de Construção)" as Camada02 #LightCyan {
+  class EntityMeta {
+    + name: String
+    + namespace: String
+    + title: String
+    + description: String
+    + tags: String[]
+    ...
+  }
+  
+  class Relation {
+    + type: String
+    + targetRef: String
+  }
+}
+
+' ===================================
+' ====== CAMADA 3: IDENTIDADE E ORGANIZAÇÃO (O QUEM) ======
+' ===================================
+package "Camada 3: Identidade e Organização (Quem)" as Camada03 #LightGreen {
+  class User <<Entity>> {
+    {field} spec:
+    + profile: Object
+    + memberOf: String[]
+  }
+
+  class Group <<Entity>> {
+    {field} spec:
+    + type: String
+    + parent: String
+    + children: String[]
+    + members: String[]
+  }
+}
+
+' ===================================
+' ====== CAMADA 4: ABSTRAÇÃO ARQUITETURAL (O QUÊ) ======
+' ===================================
+package "Camada 4: Abstração Arquitetural (O Quê)" as Camada04 #LightGoldenRodYellow {
+  class Domain <<Entity>> {
+    {field} spec:
+    + owner: String
+  }
+
+  class System  <<Entity>> {
+    {field} spec:
+    + owner: String
+    + domain: String
+  }
+}
+
+' ===================================
+' ====== CAMADA 5: IMPLEMENTAÇÃO CONCRETA (COMO) ======
+' ===================================
+package "Camada 5: Implementação Concreta (Como)" as Camada05 #LightSalmon {
+  class Component <<Entity>> {
+    {field} spec:
+    + type: String
+    + lifecycle: String
+    + owner: String
+    + system: String
+    ...
+  }
+
+  class API <<Entity>> {
+    {field} spec:
+    + type: String
+    + lifecycle: String
+    + owner: String
+    + system: String
+    ...
+  }
+
+  class Resource <<Entity>> {
+    {field} spec:
+    + type: String
+    + owner: String
+    + system: String
+  }
+}
+
+' ====================================================
+' ====== CAMADA 6: FERRAMENTAS E AUTOMAÇÃO (META-CAMADA) ======
+' ====================================================
+package "Camada 6: Ferramentas e Automação (Meta-Camada)" as Camada06 #LightPink {
+    class Location <<Entity>> {
+        {field} spec:
+        + type: String
+        + target: String
+    }
+    
+    class Template {
+        {field} spec:
+        + type: String
+        + owner: String
+        + parameters: Object[]
+        + steps: Object[]
+    }
+}
+
+
+' ===============================================
+' ====== RELAÇÕES E DEPENDÊNCIAS ENTRE CAMADAS ======
+' ===============================================
+
+' ' Herança: Todas as entidades concretas herdam da Entity abstrata
+' Entity <|-- User
+' Entity <|-- Group
+' Entity <|-- Domain
+' Entity <|-- System
+' Entity <|-- Component
+' Entity <|-- API
+' Entity <|-- Resource
+' Entity <|-- Location
+' Entity <|-- Template
+
+
+' Composição: A entidade base é composta pelas estruturas comuns
+Entity *-- "1" EntityMeta
+Entity *-- "0..*" Relation
+
+' Relações de associação que definem o grafo do catálogo
+User --|> Group : "memberOf"
+Group o-- "0..*" Group : "parent/children"
+System --> Domain : "partOf"
+Component --> System : "partOf"
+API --> System : "partOf"
+Resource --> System : "partOf"
+Component --> API : "provides/\nconsumes"
+
+' Relação funcional do Template
+Template ..> Component : "cria"
+
+' ' Dependências lógicas entre as camadas
+Camada05 ..> Camada04 : depende de
+Camada04 ..> Camada03 : "owner" refere-se a
+Camada05 ..> Camada03 : "owner" refere-se a
+Camada06 ..> Camada03 : "owner" refere-se a
+
+
+legend right
+  **Legenda das Camadas**
+
+  * **1 (Protocolo Core):** A definição abstrata e comum a tudo.
+  * **2 (Estruturas Comuns):** Os blocos de dados reutilizáveis.
+  * **3 (Identidade):** Modela as pessoas e os times.
+  * **4 (Arquitetura):** A visão lógica e de alto nível.
+  * **5 (Implementação):** Os ativos técnicos concretos.
+  * **6 (Ferramentas):** Entidades que agem sobre o catálogo (automação e descoberta).
+end legend
+
+hide empty members
+
+@enduml
