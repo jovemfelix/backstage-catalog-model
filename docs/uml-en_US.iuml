@@ -98,6 +98,10 @@ package "Layer 5: Concrete Implementation (The How)" as Layer05 #LightSalmon {
     + lifecycle: String
     + owner: String
     + system: String
+    + subcomponentOf: String
+    + providesApis: API[]
+    + consumesApis: API[]
+    + dependsOn: Entity[]
     ...
   }
 
@@ -116,6 +120,14 @@ package "Layer 5: Concrete Implementation (The How)" as Layer05 #LightSalmon {
     + owner: String
     + system: String
   }
+
+note right of Component::type
+The current set of well-known and common values for this field is:
+
+ * experimental - an experiment or early, non-production component, signaling that users may not prefer to consume it over other more established components, or that there are low or no reliability guarantees
+ * production - an established, owned, maintained component
+ * deprecated - a component that is at the end of its lifecycle, and may disappear at a later point in time
+end note
 }
 
 ' ====================================================
@@ -135,6 +147,13 @@ package "Layer 6: Tooling & Automation (Meta-Layer)" as Layer06 #LightPink {
         + parameters: Object[]
         + steps: Object[]
     }
+
+note left of Template::type
+  The type of component created by the template:
+  * service - a backend service, typically exposing an API
+  * website - a website
+  * library - a software library, such as an npm module or a Java library
+end note
 }
 
 
