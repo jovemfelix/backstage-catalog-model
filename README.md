@@ -19,6 +19,8 @@ A large catalogue of components, APIs and resources can be highly granular and h
 * Systems are a collection of entities that cooperate to perform some function
 * Domains relate entities and systems to part of the business
 
+![Ecosystem-Modeling](https://backstage.io/assets/images/software-model-entities.drawio-3ce7f43dd236c3934209fde8f21a4d9e.svg)
+
 
 # Reference
 * https://backstage.io/docs/features/software-catalog/descriptor-format/#kind-template
