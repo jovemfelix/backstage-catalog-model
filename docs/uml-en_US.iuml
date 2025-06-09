@@ -142,16 +142,16 @@ package "Layer 6: Tooling & Automation (Meta-Layer)" as Layer06 #LightPink {
 ' ====== RELATIONSHIPS & DEPENDENCIES BETWEEN LAYERS ======
 ' ===============================================
 
-' Inheritance: All concrete kinds inherit from the abstract Entity
-Entity <|-- User
-Entity <|-- Group
-Entity <|-- Domain
-Entity <|-- System
-Entity <|-- Component
-Entity <|-- API
-Entity <|-- Resource
-Entity <|-- Location
-Entity <|-- Template
+' ' Inheritance: All concrete kinds inherit from the abstract Entity
+' Entity <|-- User
+' Entity <|-- Group
+' Entity <|-- Domain
+' Entity <|-- System
+' Entity <|-- Component
+' Entity <|-- API
+' Entity <|-- Resource
+' Entity <|-- Location
+' Entity <|-- Template
 
 
 ' Composition: The base entity is composed of common structures
